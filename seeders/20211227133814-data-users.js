@@ -8,7 +8,7 @@ module.exports = {
         email: "lestari@gmail.com",
         password: hashPassword("lestari123"),
         gender: "Female",
-        role: 'admin',
+        role: 1,
         balance: 1000000,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -18,7 +18,7 @@ module.exports = {
         email: "lestaro@gmail.com",
         password: hashPassword("lestari123"),
         gender: "Male",
-        role: 'customer',
+        role: 2,
         balance: 1500000,
         createdAt: new Date(),
         updatedAt: new Date()
