@@ -19,38 +19,44 @@ class userController {
   }
 
 
-  // static login(req, res) {
-  //   let email = req.body.email;
-  //   User.findOne({ where: { email: email } })
-  //     .then(data => {
-  //       if (!data) {
-  //         res.status(401).json({ message: "Invalid Credentials" });
-  //       } else {
-  //         let compare = comparePassword(req.body.password, data.password);
-  //         if (compare == true) {
-  //           let payload = {
-  //             id: data.id,
-  //             email: data.email,
-  //             full_name: data.full_name,
-  //             username: data.username,
-  //             profile_image_url: data.profile_image_url,
-  //             age: data.age,
-  //             phone_number: data.phone_number,
-  //           }
-  //           const token = generateToken(payload);
-  //           res.status(200).json({
-  //             token: token
-  //           });
-  //           // res.status(200).json({ token: token });
-  //         } else {
-  //           res.status(401).json({ message: "Invalid Credentials" });
-  //         }
-  //       }
-  //     })
-  //     .catch(err => {
-  //       res.status(401).json(err);
-  //     });
-  // }
+  static login(req, res) {
+    let email = req.body.email;
+    user.findOne({
+      where: { email: email },
+      raw: true,
+      nest: true,
+    })
+      .then(data => {
+        if (!data) {
+          res.status(401).json({ message: "Invalid Credentials" });
+        } else {
+          let compare = comparePassword(req.body.password, data.password);
+          if (compare == true) {
+            // let payload = {
+            //   id: data.id,
+            //   email: data.email,
+            //   full_name: data.full_name,
+            //   username: data.username,
+            //   profile_image_url: data.profile_image_url,
+            //   age: data.age,
+            //   phone_number: data.phone_number,
+            // }
+
+            const token = generateToken(data);
+            // res.status(200).json({
+            //   token: token
+            // });
+
+            res.status(200).json({ token: token });
+          } else {
+            res.status(401).json({ message: "Invalid Credentials" });
+          }
+        }
+      })
+      .catch(err => {
+        res.status(401).json(err);
+      });
+  }
 
   // static update(req, res) {
   //   let id = req.params.id;
