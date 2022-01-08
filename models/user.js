@@ -88,18 +88,18 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 0,
       validate: {
         notNull: {
-          msg: "field 'balance' is required"
+          msg: "field balance is required"
         },
         isNumeric: {
-          msg: "'balance' value should be number"
+          msg: "balance value should be number"
         },
         max: {
           args: [100000000],
-          msg: "'balance' value cannot be greated than 100000000"
+          msg: "balance value cannot be greated than 100000000"
         },
         min: {
           args: [0],
-          msg: "'balance' value cannot be lower than 0"
+          msg: "balance value cannot be lower than 0"
         }
       }
     }
@@ -107,7 +107,9 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'user',
     hooks: {
-      beforeCreate: (user, option) => {
+      beforeCreate: function (user) {
+        user.balance = 0
+        user.role = 'costumer'
         user.password = hashPassword(user.password)
       },
     },
