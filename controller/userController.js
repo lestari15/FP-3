@@ -54,7 +54,6 @@ class userController {
 
   static update(req, res) {
     let id = req.params.id;
-    console.log(req.body)
     user.update(
       req.body,
       {
@@ -75,7 +74,7 @@ class userController {
           }
         });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err)
         res.status(500).json({
           message: "Terjadi kesalahan pada server"

@@ -18,5 +18,8 @@
     "sequelize": "^6.12.4",
     "sequelize-cli": "^6.3.0"
   },
+  "devDependencies": {
+    "prettier": "1.19.1"
+  },
   "license": "ISC"
 }
