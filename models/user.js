@@ -77,8 +77,8 @@ module.exports = (sequelize, DataTypes) => {
           msg: "Role is required"
         },
         isIn: {
-          args: [['admin', 'costumer']],
-          msg: "'role' value should be either 'admin' or 'costumer'"
+          args: [[1, 2]],
+          msg: "'role' value should be either 1 as admin or 2 as customer"
         }
       }
     },
