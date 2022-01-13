@@ -1,4 +1,3 @@
-const jwt = require('jsonwebtoken');
 const { categorie, product } = require('../models');
 const { verifyToken } = require('../helpers/jwt');
 
@@ -92,3 +91,5 @@ class categorieContoller {
       })
     }
   }
+
+module.exports = categorieContoller;
