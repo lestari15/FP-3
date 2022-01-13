@@ -5,7 +5,7 @@ class categorieContoller {
   static createCategory = (req, res) => {
     const user = verifyToken(req.headers.token);
     type = req.body.type;
-    categorie.create(type)
+    categorie.create({type: type})
       .then(data => {
         res.status(201).send({ category : data.toJSON()})
       })
