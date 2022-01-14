@@ -3,8 +3,7 @@ const { verifyToken } = require('../helpers/jwt');
 
 class categorieContoller {
   static createCategory = (req, res) => {
-    const user = verifyToken(req.headers.token);
-    type = req.body.type;
+    let type = req.body.type;
     categorie.create({type: type})
       .then(data => {
         res.status(201).send({ category : data.toJSON()})
@@ -29,7 +28,7 @@ class categorieContoller {
           status = 404;
           res.status(status).send('Category not found');
         }
-        res.status(status).send({ categories: data.toJSON()});
+        res.status(status).send({ categories: data});
     })
     .catch(err => {
       let errCode = 500;
