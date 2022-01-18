@@ -1,5 +1,5 @@
 const { user } = require("../models");
-const { generateToken } = require("../helpers/jwt");
+const { generateToken, verifyToken } = require("../helpers/jwt");
 const { comparePassword } = require("../helpers/bcrypt");
 const rupiahFormat = require('../utils/rupiahFormat')
 
@@ -20,6 +20,7 @@ class userController {
         });
       })
       .catch((err => {
+        console.log(err);
         res.status(500).json({
           message: "Terjadi kesalahan pada server"
         });
@@ -105,7 +106,7 @@ class userController {
   static async topUp(req, res) {
     await user.findOne({
       where: {
-        id: req.params.id
+        id: verifyToken(req.headers.token).id
       },
       returning: true,
       raw: true,
@@ -114,7 +115,7 @@ class userController {
       const bal = Number(req.body.balance) + Number(data.balance)
       await user.update({ balance: bal }, {
         where: {
-          id: req.params.id
+          id: verifyToken(req.headers.token).id
         }
       }).then(() => {
         res.status(200).json({
