@@ -1,80 +1,99 @@
 const { transactionHistorie, product, user, categorie } = require('../models');
 const { verifyToken } =  require('../helpers/jwt');
-const user = require('../models/user');
 const rupiahFormat = require('../utils/rupiahFormat');
 
 class transactionController {
   static createTransaction = (req, res) => {
     let { productId, quantity } = req.body;
+    quantity = Number(quantity);
+    let encoded = verifyToken(req.headers.token);
     product.findOne({
-      where: { title: productId}
+      where: { id: productId}
     })
-    .then(product => {
+    .then(data => {
       let status = 201;
-      encoded = verifyToken(res.headers.token);
-        if (!product) {
+        if (!data) {
           status = 404;
           res.status(status).send('Product not found');
         }
-        else if(product.stock < quantity) {
+        else if(data.stock < quantity) {
           status = 400;
           res.status(status).send('Quantity is more than existing stock!')
         }
-        else if(encoded.balance < product.price) {
+        else if(encoded.balance < quantity*data.price) {
           status = 400;
           res.status(status).send('Your balance is not enough!')
         }
         else {
-          return product.decrement('stock', {by: quantity})
+          product.update(
+            {
+              stok: data.stok - quantity
+            },
+            {
+              where: {id: data.id},
+            },
+          )
+          return product.findByPk(productId)
+          .then((data) => {
+            user.update(
+              {
+                balance: encoded.balance - data.price
+              },
+              {
+                where: {
+                  id: encoded.id
+                }
+              }
+            )
+            return data;
+          })
+          .then((data) => {
+            return categorie.findByPk(data.CategoryId)
+          })
+          .then((data) => {
+             return categorie.update(
+              {
+                sold_product_amount: data.sold_product_amount + quantity
+              },
+              {
+                where: {id: data.id}
+              }
+            )
+          })
           .then(() => {
-            return user.findById(encoded.id)
+            return product.findByPk(productId)
           })
-          .then((user) => {
-            return user.decrement('balance', {by: product.price})
-          })
-          .then(() => {
-            return categorie.findById(product.CategoryId)
-          })
-          .then((categorie) => {
-            return categorie.increment('sold_product_amount', { by: quantity})
-          })
-          .then(() => {
-            input = {
+          .then((data) => {
+            let input = {
               product_id: productId,
               user_id: encoded.id,
               quantity: quantity,
               total_price: data.price
             }
-            return transactionHistorie.create(input)
+            transactionHistorie.create(input)
+            return data;
           })
           .then((data) => {
              let output = { 
                message: 'You have been successfully purchase the product',
                transactionBill: {
-                 total_price: rupiahFormat(product.price),
+                 total_price: rupiahFormat(data.price),
                  quantity: quantity,
-                 product_name: product.product_name
+                 product_name: data.title
                  }
             }
-            res.status(status).send(output)
-          })
-          .catch(err => {
-            let errCode = 500;
-             if (err.name.includes("DatabaseError")) {
-                console.log(err);
-                errCode = 400;
-             }
-               res.status(errCode).json(err);
+            res.status(201).send(output)
           })
         }
     })
     .catch(err => {
       let errCode = 500;
-        if (err.name.includes("DatabaseError")) {
+       if (err.name.includes("DatabaseError")) {
           console.log(err);
           errCode = 400;
-        }
-        res.status(errCode).json(err);
+       }
+      console.log(err);
+      res.status(errCode).json(err);
     })
   }
 
@@ -87,18 +106,21 @@ class transactionController {
       include: [
         {
           model: product,
-          attributes: ['id', 'title', 'price', 'stock', 'CategoryId']
+          attributes: ['id', 'title', 'price', 'stok', 'CategoryId']
         }
       ]
     })
     .then(data => {
       let errCode = 200;
-      data.product.price = rupiahFormat(data.product.price);
+      data.map(item => {
+        item.dataValues.total_price = rupiahFormat(item.dataValues.total_price);
+        item.dataValues.product.dataValues.price = rupiahFormat(item.dataValues.product.dataValues.price);
+      });
       if (!data) {
         errCode = 404;
         res.status(errCode).send('Transaction not found!');
       }
-      res.status(errCode).send({transactionHistories: data});
+      res.status(errCode).json({transactionHistories: data});
     })
     .catch(err => {
       let errCode = 500;
@@ -106,17 +128,17 @@ class transactionController {
           console.log(err);
           errCode = 400;
         }
+        console.log(err);
         res.status(errCode).json(err);
     })
   }
 
   static getTransAdmin = (req, res) => {
-    let encoded = verifyToken(req.headers.token);
     transactionHistorie.findAll({
       include: [
         {
           model: product,
-          attributes: ['id', 'title', 'price', 'stock', 'CategoryId']
+          attributes: ['id', 'title', 'price', 'stok', 'CategoryId']
         },
         {
           model: user,
@@ -126,16 +148,23 @@ class transactionController {
     })
     .then(data => {
       let errCode = 200;
-      data.product.price = rupiahFormat(data.product.price);
+      console.log(data)
+      data.map(item => {
+        item.dataValues.total_price = rupiahFormat(item.dataValues.total_price);
+        item.dataValues.product.dataValues.price = rupiahFormat(item.dataValues.product.dataValues.price);
+        item.dataValues.user.dataValues.balance = rupiahFormat(item.dataValues.user.dataValues.balance);
+      });
       if (!data) {
         errCode = 404;
         res.status(errCode).send('Transaction not found!');
       }
-      if (data.user.role == 1) {
-        data.user.role = 'admin'
-      } else {
-        data.user.role = 'user'
-      }
+      data.map(item => {
+        if(item.dataValues.user.role == 1) {
+          item.dataValues.user.role = 'admin'
+        } else {
+          item.dataValues.user.role = 'user'
+        }
+      });
       res.status(errCode).send({transactionHistories: data});
     })
     .catch(err => {
@@ -144,26 +173,27 @@ class transactionController {
           console.log(err);
           errCode = 400;
         }
+        console.log(err);
         res.status(errCode).json(err);
     })
   }
 
-  getTransId = (req, res) => {
-    let encoded = req.headers.token;
-    transactionHistorie.findById({
+  static getTransId = (req, res) => {
+    transactionHistorie.findOne({
       where: {id: req.params.transactionId},
       include: {
         model: product,
-        attributes: ['id', 'title', 'price', 'stock', 'CategoryId']
+        attributes: ['id', 'title', 'price', 'stok', 'CategoryId']
       }
     })
     .then(data => {
       let errCode = 200;
-      data.product.price = rupiahFormat(data.product.price);
       if (!data) {
         errCode = 404;
         res.status(errCode).send('Transaction not found!');
       }
+      data.total_price = rupiahFormat(data.total_price);
+      data.product.price = rupiahFormat(data.product.price);
       res.status(errCode).send({transactionHistories: data});
     })
     .catch(err => {
@@ -172,6 +202,7 @@ class transactionController {
           console.log(err);
           errCode = 400;
         }
+        console.log(err);
         res.status(errCode).json(err);
     })
   }
