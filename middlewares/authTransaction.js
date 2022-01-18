@@ -4,11 +4,11 @@ require('dotenv').config();
 
 function authorizationTrans(req, res, next) {
   const authHeader = req.headers.token
-  encoded = jwt.verify(authHeader, 'rahasia')
   if (authHeader == null) return res.status(401).send({
     message: 'Unauthorized',
     status: false
   })
+  encoded = jwt.verify(authHeader, process.env.SECRET_KEY)
   transactionHistorie.findAll({
     where: {user_id: authHeader.id}
   })
