@@ -8,9 +8,9 @@ function authorizationTrans(req, res, next) {
     message: 'Unauthorized',
     status: false
   })
-  encoded = jwt.verify(authHeader, process.env.SECRET_KEY)
-  transactionHistorie.findAll({
-    where: {user_id: authHeader.id}
+  let encoded = jwt.verify(authHeader, process.env.SECRET_KEY)
+  transactionHistorie.findOne({
+    where: {user_id: encoded.id}
   })
   .then(data => {
     if(data || encoded.role == 1) {
