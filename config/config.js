@@ -28,13 +28,5 @@ module.exports = {
     database: process.env.DB_DATABASE_PRODUCTION,
     host: process.env.DB_HOST_PRODUCTION,
     dialect: process.env.DB_DIALECT_PRODUCTION,
-    port: 5432,
-    dialectOptions: {
-      bigNumberStrings: true,
-      ssl: {
-      require: true, // This will help you. But you will see nwe error
-      rejectUnauthorized: false // This line will fix new error
-    }
-    }
-    }
+  }
 };
