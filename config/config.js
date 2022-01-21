@@ -23,11 +23,13 @@ module.exports = {
     }
   },
   production: {
-    username: 'wucuzrzbwggefn',
-    password: '423d23c03103c5168f4b29287854e2c7d85c72da2c16c90db5035a986e5d9f35',
-    database: 'df98t0ejp7kfjm',
-    host: 'ec2-18-234-17-166.compute-1.amazonaws.com',
-    port: 5432,
-    dialect: 'postgres',
+    username: process.env.DB_USERNAME_PRODUCTION,
+    password: process.env.DB_PASSWORD_PRODUCTION,
+    database: process.env.DB_DATABASE_PRODUCTION,
+    host: process.env.DB_HOST_PRODUCTION,
+    dialect: process.env.DB_DIALECT_PRODUCTION,
+    dialectOptions: {
+      bigNumberStrings: true
+    }
     }
 };
