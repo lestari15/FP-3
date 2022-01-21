@@ -1,5 +1,5 @@
-const fs = require('fs');
-require('dotenv').config();
+const fs = require("fs");
+require("dotenv").config();
 module.exports = {
   development: {
     username: process.env.DB_USERNAME,
@@ -15,9 +15,9 @@ module.exports = {
     username: process.env.CI_DB_USERNAME,
     password: process.env.CI_DB_PASSWORD,
     database: process.env.CI_DB_NAME,
-    host: '127.0.0.1',
+    host: "127.0.0.1",
     port: 3306,
-    dialect: 'mysql',
+    dialect: "mysql",
     dialectOptions: {
       bigNumberStrings: true
     }
@@ -28,8 +28,13 @@ module.exports = {
     database: process.env.DB_DATABASE_PRODUCTION,
     host: process.env.DB_HOST_PRODUCTION,
     dialect: process.env.DB_DIALECT_PRODUCTION,
+    port: 5432,
     dialectOptions: {
-      bigNumberStrings: true
+      bigNumberStrings: true,
+      ssl: {
+        require: true, // This will help you. But you will see nwe error
+        rejectUnauthorized: false // This line will fix new error
+      }
     }
-    }
+  }
 };
