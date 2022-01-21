@@ -23,10 +23,10 @@ module.exports = {
     }
   },
   production: {
-    username: 'wcjjqrlziwspwa',
-    password: '39e574dc77f819b98224072e80aab452f57a1e93be2f4c610edf26e43433aa88',
-    database: 'd5sm3dhc7c5c85',
-    host: 'ec2-3-228-75-39.compute-1.amazonaws.com',
+    username: 'wucuzrzbwggefn',
+    password: '423d23c03103c5168f4b29287854e2c7d85c72da2c16c90db5035a986e5d9f35',
+    database: 'df98t0ejp7kfjm',
+    host: 'ec2-18-234-17-166.compute-1.amazonaws.com',
     port: 5432,
     dialect: 'postgres',
     dialectOptions: {
