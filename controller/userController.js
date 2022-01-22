@@ -104,6 +104,7 @@ class userController {
   }
 
   static async topUp(req, res) {
+    console.log(verifyToken(req.headers.token).id)
     await user.findOne({
       where: {
         id: verifyToken(req.headers.token).id
@@ -113,6 +114,7 @@ class userController {
       nest: true,
     }).then(async (data) => {
       const bal = Number(req.body.balance) + Number(data.balance)
+      console.log(bal)
       await user.update({ balance: bal }, {
         where: {
           id: verifyToken(req.headers.token).id
